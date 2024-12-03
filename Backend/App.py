@@ -4,6 +4,8 @@ import snowflake.connector as sc
 import uvicorn
 from dotenv import load_dotenv
 import os
+from .Securite import password_hash,password_verify
+from.Models import Recruteurs,Candidats,Offres,Competences,log_candidat,log_recruteur
 
 load_dotenv()
 app = FastAPI()
@@ -25,12 +27,101 @@ conn= sc.connect(
     database=os.getenv('snowflake_database'),
    
 )
+cursor=conn.cursor()
 
-if conn :
-    print('connection reussie')
+@app.post("/register_recruteur")
 
+async def Recruteur_register(U:Recruteurs):
 
+    sql = "SELECT * FROM Easy_Rec.easy.Recruteurs where email=%s"
+    params=[U.email]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone() 
+    if resultat:
+        return{"message":" email deja existant "}
+    else:
+        cursor.execute(sql,params)
+        pwd_hash=password_hash(U.password)
+        sql = """
+        INSERT INTO Easy_Rec.easy.Recruteurs (nom_entreprise, email, password)
+        VALUES (%s, %s, %s)
+        """ 
+        params=[U.nom_entreprise,U.email,pwd_hash]
+        cursor.execute(sql,params)
+        return{"message":"utilisateur bien  ajoute"}
 
+@app.post("/register_candidat")
+async def Candidat_register(U:Candidats):
+
+    sql = "SELECT * FROM Easy_Rec.easy.Recruteurs where email=%s"
+    params=[U.email]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone() 
+    if resultat:
+        return{"message":" email deja existant "}
+    else:
+        pwd_hash=password_hash(U.password)
+        sql = """
+        INSERT INTO Easy_Rec.easy.Candidats (nom, prenom, email, password, cv)
+        VALUES (%s, %s, %s, %s, %s)
+        """ 
+        params=[U.nom,U.prenom,U.email,pwd_hash,None]
+        x=cursor.execute(sql,params)
+        
+    return {"message":"utilisateur bien ajouter"}
+
+@app.post("/offres")
+async def Offre_add(U:Offres):
+    
+    sql="insert into table offres value(?,?,?,?,?)"
+    cursor.execute(sql,("",U.titre,U.salaire,U.description,""))
+    return{"message":"offres bien ajoutes"}
+
+@app.post("/competence")
+async def Competences(U:Competences):
+    sql="insert into table Competences value(?)"
+    cursor.execute(sql,(U.competence))
+    return{"message":"ok"}
+
+@app.post("/log_recruteur")
+async def Recruteur_login(U:log_recruteur):
+    sql = "SELECT * FROM Easy_Rec.easy.Recruteurs where email=%s"
+    params=[U.email]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone()
+    if resultat==None:
+        response="email invalide"
+        return{"message": response}
+    else:
+        pwd_veri=password_verify(U.password,resultat[3])
+    
+        if pwd_veri:
+            response=resultat
+        else:
+            response="password invalide "
+
+    return{"message": response}
+
+@app.post("/log_candidat")
+async def Recruteur_login(U:log_candidat):
+    sql = "SELECT * FROM Easy_Rec.easy.Candidats where email=%s"
+    params=[U.email]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone()
+    if resultat==None:
+        response="email invalide"
+        return{"message": response}
+    else:
+        pwd_veri=password_verify(U.password,resultat[3])
+        print(pwd_veri)
+        if pwd_veri:
+            response=resultat
+        else:
+            response="password invalide "
+    
+    
+   
+    return{"message":response}
 
 if __name__=="__name__":
     uvicorn.run(app,host="0.0.0.0", port=8000,workers=1)

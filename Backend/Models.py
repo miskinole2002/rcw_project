@@ -1,0 +1,36 @@
+from pydantic import BaseModel
+
+
+class Recruteurs(BaseModel):    
+    nom_entreprise:str 
+    email:str
+    password:str 
+
+class Candidats(BaseModel):
+    nom:str
+    prenom:str
+    email:str
+    password:str
+
+class Offres(BaseModel):
+       titre:str
+       salaire:str
+       description:str
+       
+class Competences(BaseModel):
+      competence:str
+
+class log_recruteur(BaseModel):
+      email:str
+      password:str
+
+class log_candidat(BaseModel):
+        email:str
+        password: str
+
+
+
+
+
+
+
