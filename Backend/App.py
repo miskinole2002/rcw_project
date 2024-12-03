@@ -132,13 +132,20 @@ async def Recruteur_login(U:log_candidat):
 
 @app.post("/upload_cv")
 async def Upload_cv(file:UploadFile=File(...)):
-    print(file)
+    
     content_Type = {"application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
     if file.content_type not in content_Type:
         response='format de fichier non valide'
     else:
         path_dir="Backend\Cvs"
-        path=os.path.join(path_dir,file.filename)
+        path=rf"{os.path.join(path_dir,file.filename)}"
+        
+        candidat_id=201
+        sql = """
+             update Easy_Rec.easy.Candidats set cv =%s where candidat_id =%s
+        """ 
+        params=[path,candidat_id] 
+        cursor.execute(sql,params)
 
         with open(path,"wb")as f:
 
@@ -153,7 +160,7 @@ async def Upload_cv(file:UploadFile=File(...)):
         
     
 
-    return {"filename": file.filename}
+
 
 if __name__=="__name__":
     uvicorn.run(app,host="0.0.0.0", port=8000,workers=1)
