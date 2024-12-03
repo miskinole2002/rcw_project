@@ -4,8 +4,8 @@ import snowflake.connector as sc
 import uvicorn
 from dotenv import load_dotenv
 import os
-from .Securite import password_hash,password_verify
-from.Models import Recruteurs,Candidats,Offres,Competences,log_candidat,log_recruteur
+from .Functions import password_hash,password_verify
+from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur
 
 load_dotenv()
 app = FastAPI()
