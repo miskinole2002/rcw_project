@@ -75,15 +75,20 @@ async def Candidat_register(U:Candidats):
 @app.post("/offres")
 async def Offre_add(U:Offres):
     
-    sql="insert into table offres value(?,?,?,?,?)"
-    cursor.execute(sql,("",U.titre,U.salaire,U.description,""))
-    return{"message":"offres bien ajoutes"}
+        sql = """
+             INSERT INTO Easy_Rec.easy.Offres (titre, recruteur_id,salaire,description)
+            VALUES (%s, %s, %s, %s, %s)
+        """ 
+        params=[U.titre,U.recruteur_id,U.salaire,U.description]
+        x=cursor.execute(sql,params)
+        return{"message":"offres bien ajoutes"}
 
-@app.post("/competence")
-async def Competences(U:Competences):
-    sql="insert into table Competences value(?)"
-    cursor.execute(sql,(U.competence))
-    return{"message":"ok"}
+@app.get("/")
+async def Get_offre():
+    sql = "SELECT * FROM Easy_Rec.easy.Offres"
+    cursor.execute(sql)
+    resultat=cursor.fetchall() 
+    return{"response":resultat}
 
 @app.post("/log_recruteur")
 async def Recruteur_login(U:log_recruteur):
@@ -124,6 +129,7 @@ async def Recruteur_login(U:log_candidat):
     
    
     return{"message":response}
+
 
 if __name__=="__name__":
     uvicorn.run(app,host="0.0.0.0", port=8000,workers=1)
