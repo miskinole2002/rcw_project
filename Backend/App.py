@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,File,UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import snowflake.connector as sc
 import uvicorn
@@ -130,6 +130,30 @@ async def Recruteur_login(U:log_candidat):
    
     return{"message":response}
 
+@app.post("/upload_cv")
+async def Upload_cv(file:UploadFile=File(...)):
+    print(file)
+    content_Type = {"application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
+    if file.content_type not in content_Type:
+        response='format de fichier non valide'
+    else:
+        path_dir="Backend\Cvs"
+        path=os.path.join(path_dir,file.filename)
+
+        with open(path,"wb")as f:
+
+            content= await file.read()
+            f.write(content)
+            response=file.filename
+
+    return{'response':response}
+
+
+
+        
+    
+
+    return {"filename": file.filename}
 
 if __name__=="__name__":
     uvicorn.run(app,host="0.0.0.0", port=8000,workers=1)
