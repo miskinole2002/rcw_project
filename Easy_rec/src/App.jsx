@@ -11,9 +11,9 @@ function App() {
     // <Login_cand/>
 
     // <Register_cand/>
-    // <Register_rec/>
+    <Register_rec/>
     // <Login_Rec/>
-    <Login_cand/>
+    // <Login_cand/>
 
     )
   

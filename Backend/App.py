@@ -53,10 +53,12 @@ async def Recruteur_register(U:Recruteurs):
 @app.post("/register_candidat")
 async def Candidat_register(U:Candidats):
 
-    sql = "SELECT * FROM Easy_Rec.easy.Recruteurs where email=%s"
+    sql = "SELECT * FROM Easy_Rec.easy.Candidats where email=%s"
     params=[U.email]
+    print(params)
     cursor.execute(sql,params)
     resultat=cursor.fetchone() 
+    print(resultat)
     if resultat:
         return{"message":" email deja existant "}
     else:
@@ -68,7 +70,7 @@ async def Candidat_register(U:Candidats):
         params=[U.nom,U.prenom,U.email,pwd_hash,None]
         x=cursor.execute(sql,params)
         
-    return {"message":"utilisateur bien ajouter"}
+        return {"message":"utilisateur bien ajouter"}
 
 @app.post("/offres")
 async def Offre_add(U:Offres):
