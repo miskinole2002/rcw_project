@@ -142,7 +142,7 @@ async def Upload_cv(file:UploadFile=File(...)):
         
         candidat_id=201
         sql = """
-             update Easy_Rec.easy.Candidats set cv =%s where candidat_id =%s
+            update Easy_Rec.easy.Candidats set cv =%s where candidat_id =%s
         """ 
         params=[path,candidat_id] 
         cursor.execute(sql,params)
