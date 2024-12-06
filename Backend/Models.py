@@ -17,12 +17,14 @@ class Offres(BaseModel):
        recruteur_id:str
        salaire:str
        description:str
+       competences:str
        
 
 
 class log_recruteur(BaseModel):
       email:str
       password:str
+
 
 class log_candidat(BaseModel):
         email:str

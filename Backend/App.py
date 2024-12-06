@@ -77,9 +77,9 @@ async def Offre_add(U:Offres):
     
         sql = """
              INSERT INTO Easy_Rec.easy.Offres (titre, recruteur_id,salaire,description)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s,%s)
         """ 
-        params=[U.titre,U.recruteur_id,U.salaire,U.description]
+        params=[U.titre,U.recruteur_id,U.salaire,U.description,U.competences]
         x=cursor.execute(sql,params)
         return{"message":"offres bien ajoutes"}
 
