@@ -13,9 +13,9 @@ function App() {
 
     // <Register_cand/>
     // <Register_rec/>
-    // <Login_Rec/>
+    <Login_Rec/>
     // <Login_cand/>
-    <Upload_cv/>
+    // <Upload_cv/>
     )
   
 }
