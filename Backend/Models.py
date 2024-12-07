@@ -30,7 +30,9 @@ class log_candidat(BaseModel):
         email:str
         password: str
 
-
+class OByIdR(BaseModel):
+      recruteurs_id:str
+      
 
 
 

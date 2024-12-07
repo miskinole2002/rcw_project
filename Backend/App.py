@@ -5,7 +5,7 @@ import uvicorn
 from dotenv import load_dotenv
 import os
 from .Functions import password_hash,password_verify
-from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur
+from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR
 
 load_dotenv()
 app = FastAPI()
@@ -76,7 +76,7 @@ async def Candidat_register(U:Candidats):
 async def Offre_add(U:Offres):
     
         sql = """
-             INSERT INTO Easy_Rec.easy.Offres (titre, recruteur_id,salaire,description,comptences)
+             INSERT INTO Easy_Rec.easy.Offres (titre, recruteur_id,salaire,description,comptences)  
             VALUES (%s, %s, %s, %s,%s)
         """ 
         params=[U.titre,U.recruteur_id,U.salaire,U.description,U.competences]
@@ -92,45 +92,36 @@ async def Get_offre():
 
 @app.post("/log_recruteur")
 async def Recruteur_login(U:log_recruteur):
-    sql1 = "SELECT * FROM Easy_Rec.easy.Recruteurs where email=%s"
-    sql ="""SELECT * FROM Easy_Rec.easy.Recruteurs r 
-      left join Easy_Rec.easy.offres o on r.recruteur_id =o.recruteur_id  
-      left join Easy_Rec.easy.Candidatures c  on c.offre_id =o.offre_id
-      left join Easy_Rec.easy.Candidats a  on a.candidat_id =c.candidat_id
-      where r.email=%s"""
+    sql = "SELECT recruteur_id, nom_entreprise,password FROM Easy_Rec.easy.Recruteurs where email=%s"
+
+    # sql ="""SELECT r.recruteur_id,o.titre,o.salaire,o.description,o.competences FROM Easy_Rec.easy.Recruteurs r 
+    #   left join Easy_Rec.easy.offres o on r.recruteur_id =o.recruteur_id  
+    #   left join Easy_Rec.easy.Candidatures c  on c.offre_id =o.offre_id
+    #   left join Easy_Rec.easy.Candidats a  on a.candidat_id =c.candidat_id
+    #   where r.email=%s"""
     
     params=[U.email]
     cursor.execute(sql,params)
-    resultat=cursor.fetchall()
-    print(resultat) 
-    Resul=[]
-    if len(resultat)==0 : 
-        response="email invalide"
+    resultat=cursor.fetchone()
+    print(resultat)
+    if resultat is None : 
+        response="email introuvable"
         return{"message": response}
     else:
-        for row in resultat:
-            pwd_veri=password_verify(U.password,row[3])
-            print(pwd_veri)
-            if pwd_veri:
+       
+        pwd_veri=password_verify(U.password,resultat[2])
+      
+        if pwd_veri:
                 
                 result={
-                    "recruteur_id" : row[0], 
-                    "nom_entreprise":row[1],
-                    " email":row[2],
-                    "password":row[3] ,
-                    "offre-id":row[4],
-                    "titre":row[5],
-                    "id":row[8],
-                    "salaire":row[6],
-                    "description":row[7],
-                    " competences":row[9]
+                    "recruteur_id" : resultat[0], 
+                    "nom_entreprise":resultat[1],
                     }
-                response= Resul.append(result)
-            else:
+                
+                response=result
+        else:
                 response="password invalide "
         
-        response=Resul
-
         return{"message":response} 
 
 @app.post("/log_candidat")
@@ -179,33 +170,32 @@ async def Upload_cv(file:UploadFile=File(...)):
 
     return{'response':response}
 
+#pour recuperer les offres et le candidature qui sont lies aux recruteurs
+@app.post("/get_offre_by_idRecruteur")
+async def get_offre_byId(U:OByIdR):
+    sql ="""SELECT r.nom_entreprise,o.titre,o.salaire,o.description,o.competences ,a.cv,c.lettre_motivation FROM Easy_Rec.easy.Recruteurs r 
+      left join Easy_Rec.easy.offres o on r.recruteur_id =o.recruteur_id  
+      left join Easy_Rec.easy.Candidatures c  on c.offre_id =o.offre_id
+      left join Easy_Rec.easy.Candidats a  on a.candidat_id =c.candidat_id
+      where r.recruteur_id=%s"""
+    params=[U.recruteur_id]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchall()
+    response=[]
+    for row in resultat:
+        result={
+           
+            "nom_entreprise":row[0],
+            "titre":row[1],
+            "salaire":row[2],
+            "description":row[3],
+            " competences":row[4],
+            "cv":row[5]
+        }
+        response.append(result)
+    return{"message":response}
 
-# @app.post("/log_recruteur")
-# async def Recruteur_login(U:log_recruteur):
-#     sql ="""SELECT * FROM Easy_Rec.easy.Recruteurs r 
-#       join Easy_Rec.easy.offres o on r.recruteur_id =o.recruteur_id  
-#       left join Easy_Rec.easy.Candidatures c  on c.offre_id =o.offre_id
-#       left join Easy_Rec.easy.Candidats a  on a.candidat_id =c.candidat_id
 
-#       where r.email=%s"""
-#     params=[U.email]
-#     cursor.execute(sql,params)
-#     resultat=cursor.fetchall()
-
-#     # for row in resultat:
-#     #     result={
-#     #         "recruteur_id" : row[0], 
-#     #         "nom_entreprise":row[1],
-#     #         " email":row[2],
-#     #         "password":row[3] ,
-#     #         "offre-id":row[4],
-#     #         "titre":row[5],
-#     #         "id":row[8],
-#     #         "salaire":row[6],
-#     #         "description":row[7],
-#     #         " competences":row[9]
-#     #     }
-#     return{"message":resultat}
         
     
 
