@@ -4,8 +4,10 @@ import snowflake.connector as sc
 import uvicorn
 from dotenv import load_dotenv
 import os
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from .Functions import password_hash,password_verify
-from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR
+from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,Acandidats,Arecruteurs
 
 load_dotenv()
 app = FastAPI()
@@ -194,6 +196,84 @@ async def get_offre_byId(U:OByIdR):
         }
         response.append(result)
     return{"message":response}
+
+#pour ajouter un abonnement recruteurs
+
+@app.post("./abonnement_recruteurs")
+async def Abonnement_recruteur(U:Arecruteurs):
+    current_time=datetime.now()
+    future_tinme=current_time+ relativedelta(years=1)
+    begin_date=current_time.strftime("%d-%m-%y")
+    end_date=future_tinme.strftime("%d-%m-%y")
+     
+
+    sql = """
+        INSERT INTO Easy_Rec.easy.abonnement_recruteurs (recruteur_id,date_debut,date_fin,forfait)  
+        VALUES (%s, %s, %s, %s)
+        """ 
+    
+    params=[U.recruteur_id,begin_date,end_date,U.forfait]
+    cursor.execute(sql,params)
+    return{"message":"Ok"}
+
+#abonnement candidat
+
+@app.post("./abonnement_candidats")
+async def Abonnement_candidat(U:Acandidats):
+    current_time=datetime.now()
+    future_tinme=current_time+ relativedelta(years=1)
+    begin_date=current_time.strftime("%d-%m-%y")
+    end_date=future_tinme.strftime("%d-%m-%y")
+     
+
+    sql = """
+        INSERT INTO Easy_Rec.easy.abonnement_candidats (recruteur_id,date_debut,date_fin,forfait)  
+        VALUES (%s, %s, %s, %s)
+        """ 
+    
+    params=[U.recruteur_id,begin_date,end_date,U.forfait]
+    cursor.execute(sql,params)
+    return{"message":"Ok"}
+
+# recherche de l'abonnement en fonction de recruteur_id
+@app.get("./get_abonnement_By_Rid")
+async def get_AbonnementByIDdR(recruteur_id:str):
+
+    sql = """SELECT forfait,date_debut,date_fin FROM Easy_Rec.easy.abonnement_recruteurs where recruteur_id=%s"""
+    params=[recruteur_id]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone()
+    response={
+        'forfait':resultat[0],
+        'date_debut':resultat[1],
+        'date_fin':resultat[2]
+    }
+
+
+    return{'message':response}
+
+# recherche de l'abonnement en fonction de candidat_id
+@app.get("./get_abonnement_By_Rid")
+async def get_AbonnementByIDCan(candidat_id:str):
+
+    sql = """SELECT forfait,date_debut,date_fin FROM Easy_Rec.easy.abonnement_candidats where candidat_id=%s"""
+    params=[candidat_id]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone()
+    response={
+        'forfait':resultat[0],
+        'date_debut':resultat[1],
+        'date_fin':resultat[2]
+    }
+
+
+    return{'message':response}
+
+    
+
+
+
+
 
 
         
