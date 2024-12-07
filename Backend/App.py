@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from .Functions import password_hash,password_verify
-from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,Acandidats,Arecruteurs
+from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs
 
 load_dotenv()
 app = FastAPI()
@@ -193,6 +193,26 @@ async def get_offre_byId(U:OByIdR):
             "description":row[3],
             " competences":row[4],
             "cv":row[5]
+        }
+        response.append(result)
+    return{"message":response}
+
+#pour recuperer les offres aux quelles les candidats ont postustees 
+@app.post("/get_offre_by_idcandidat")
+async def get_offre_byIdC(U:OByIdC):
+    sql ="""SELECT o.titre,o.salaire,o.description,0.competences FROM Easy_Rec.easy.candidutres c
+     join offre o on c.offre_id=o.id
+      where c.candidat_id=%s"""
+    params=[U.candidat_id]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchall()
+    response=[]
+    for row in resultat:
+        result={
+            "titre":row[0],
+            "salaire":row[1],
+            "description":row[2],
+            " competences":row[3],
         }
         response.append(result)
     return{"message":response}

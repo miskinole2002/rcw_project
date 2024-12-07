@@ -33,6 +33,9 @@ class log_candidat(BaseModel):
 class OByIdR(BaseModel):
       recruteurs_id:str
 
+class OByIdC(BaseModel):
+      candidats_id:str
+
 class Arecruteurs(BaseModel):
       forfait:str
       recruteur_id:str
