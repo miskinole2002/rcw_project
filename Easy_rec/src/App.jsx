@@ -1,4 +1,5 @@
 import './App.css'
+import Lettre from './components/Lettre'
 import Login_cand from './components/Login_cand'
 import Login_Rec from './components/Login_Rec'
 import Register_cand from './components/Register_cand'
@@ -13,9 +14,10 @@ function App() {
 
     // <Register_cand/>
     // <Register_rec/>
-    <Login_Rec/>
+    // <Login_Rec/>
     // <Login_cand/>
     // <Upload_cv/>
+    <Lettre/>
     )
   
 }

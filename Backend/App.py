@@ -8,6 +8,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from .Functions import password_hash,password_verify
 from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs
+from.Funct_Ia import lettre_motivation
 
 load_dotenv()
 app = FastAPI()
@@ -200,7 +201,7 @@ async def get_offre_byId(U:OByIdR):
 #pour recuperer les offres aux quelles les candidats ont postustees 
 @app.post("/get_offre_by_idcandidat")
 async def get_offre_byIdC(U:OByIdC):
-    sql ="""SELECT o.titre,o.salaire,o.description,0.competences FROM Easy_Rec.easy.candidutres c
+    sql ="""SELECT o.titre,o.salaire,o.description,o.competences FROM Easy_Rec.easy.candidutres c
      join offre o on c.offre_id=o.id
       where c.candidat_id=%s"""
     params=[U.candidat_id]
@@ -219,7 +220,7 @@ async def get_offre_byIdC(U:OByIdC):
 
 #pour ajouter un abonnement recruteurs
 
-@app.post("./abonnement_recruteurs")
+@app.post("/abonnement_recruteurs")
 async def Abonnement_recruteur(U:Arecruteurs):
     current_time=datetime.now()
     future_tinme=current_time+ relativedelta(years=1)
@@ -238,7 +239,7 @@ async def Abonnement_recruteur(U:Arecruteurs):
 
 #abonnement candidat
 
-@app.post("./abonnement_candidats")
+@app.post("/abonnement_candidats")
 async def Abonnement_candidat(U:Acandidats):
     current_time=datetime.now()
     future_tinme=current_time+ relativedelta(years=1)
@@ -256,7 +257,7 @@ async def Abonnement_candidat(U:Acandidats):
     return{"message":"Ok"}
 
 # recherche de l'abonnement en fonction de recruteur_id
-@app.get("./get_abonnement_By_Rid")
+@app.get("/get_abonnement_By_Rid/{recruteur_id}")
 async def get_AbonnementByIDdR(recruteur_id:str):
 
     sql = """SELECT forfait,date_debut,date_fin FROM Easy_Rec.easy.abonnement_recruteurs where recruteur_id=%s"""
@@ -273,7 +274,7 @@ async def get_AbonnementByIDdR(recruteur_id:str):
     return{'message':response}
 
 # recherche de l'abonnement en fonction de candidat_id
-@app.get("./get_abonnement_By_Rid")
+@app.get("/get_abonnement_By_Rid{candidat_id:}")
 async def get_AbonnementByIDCan(candidat_id:str):
 
     sql = """SELECT forfait,date_debut,date_fin FROM Easy_Rec.easy.abonnement_candidats where candidat_id=%s"""
@@ -287,11 +288,21 @@ async def get_AbonnementByIDCan(candidat_id:str):
     }
 
 
-    return{'message':response}
+    return{'message':response} 
 
+# generer des lettre de motivation 
+@app.get("/get_lettre_motivation/{offre_id}")
+async def getLettreMotivation(offre_id:str):
+    sql = """SELECT titre,salaire,description,competences FROM Easy_Rec.easy.offres where offre_id=%s"""
+    params=[offre_id]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone()
+    response=f"titre:{resultat[0]}\n salaire:{ resultat[1]}\n description:{resultat[2]}\n competences:{resultat[3]}"
+    lettre=lettre_motivation(response)
+    return{"message":lettre} 
     
 
-
+ 
 
 
 
