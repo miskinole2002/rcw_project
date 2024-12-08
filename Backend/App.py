@@ -95,12 +95,11 @@ async def Get_offre():
     response=[]
     for row in resultat:
         result={
-           
             "offre_id":row[0],
-            "recruteur_id":row[1],
-            "titre":row[2],
-            "salaire":row[3],
-            " description  ":row[4],
+            "titre":row[1],
+            "salaire":row[2],
+            " description  ":row[3],
+            "recruteur_id":row[4],
             "competences":row[5]
               }
         response.append(result)
@@ -331,7 +330,6 @@ async def chatbot(U:Chat):
     response=f"titre:{resultat[1]}\n\n salaire:{resultat[2]}\n\n description:\t{resultat[3]}\n\n competences:\t{resultat[4]}"
     question=U.text
     x=chat(path,response,question)
-    print(x)
     return{"response":x}
  
 
