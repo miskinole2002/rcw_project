@@ -8,7 +8,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from .Functions import password_hash,password_verify
 from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs,Chat
-from.Funct_Ia import lettre_motivation
+from.Funct_Ia import lettre_motivation,chat
+
 
 load_dotenv()
 app = FastAPI()
@@ -314,8 +315,24 @@ async def getLettreMotivation(offre_id:str):
     lettre=lettre_motivation(response)
     return{"message":lettre} 
 
+#pour communiquer avec le chatBot
+@app.post("/chatbot")
+async def chatbot(U:Chat):
 
-
+    sql=""" select a.cv,o.titre,o.salaire,o.description,o.competences from Easy_Rec.easy.candidatures c
+            left join Easy_Rec.easy.offres o on c.offre_id=o.offre_id
+            left join Easy_Rec.easy.candidats a on c.candidat_id=a.candidat_id
+            where c.candidat_id=%s;
+        """ 
+    params=[U.id]
+    cursor.execute(sql,params)
+    resultat=cursor.fetchone()
+    path=resultat[0]
+    response=f"titre:{resultat[1]}\n\n salaire:{resultat[2]}\n\n description:\t{resultat[3]}\n\n competences:\t{resultat[4]}"
+    question=U.text
+    x=chat(path,response,question)
+    print(x)
+    return{"response":x}
  
 
 

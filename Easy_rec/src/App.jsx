@@ -1,4 +1,5 @@
 import './App.css'
+import Chat from './components/Chat'
 import Lettre from './components/Lettre'
 import Login_cand from './components/Login_cand'
 import Login_Rec from './components/Login_Rec'
@@ -18,6 +19,7 @@ function App() {
     // <Login_cand/>
     // <Upload_cv/>
     <Lettre/>
+    // <Chat/>
     )
   
 }
