@@ -43,7 +43,12 @@ class Arecruteurs(BaseModel):
 
 class Acandidats(BaseModel):
       forfait:str
-      caniddat_id:str
+      candidat_id:str
+
+class Chat(BaseModel):
+      id:str
+      text:str
+      
 
       
       

@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from .Functions import password_hash,password_verify
-from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs
+from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs,Chat
 from.Funct_Ia import lettre_motivation
 
 load_dotenv()
@@ -86,12 +86,25 @@ async def Offre_add(U:Offres):
         x=cursor.execute(sql,params)
         return{"message":"offres bien ajoutes"}
 
-@app.get("/")
+@app.get("/") #j'ai modifier ca pour recuperer les offres
 async def Get_offre():
     sql = "SELECT * FROM Easy_Rec.easy.Offres"
     cursor.execute(sql)
     resultat=cursor.fetchall() 
-    return{"response":resultat}
+    response=[]
+    for row in resultat:
+        result={
+           
+            "offre_id":row[0],
+            "recruteur_id":row[1],
+            "titre":row[2],
+            "salaire":row[3],
+            " description  ":row[4],
+            "competences":row[5]
+              }
+        response.append(result)
+
+    return{"response":response}
 
 @app.post("/log_recruteur")
 async def Recruteur_login(U:log_recruteur):
@@ -248,11 +261,11 @@ async def Abonnement_candidat(U:Acandidats):
      
 
     sql = """
-        INSERT INTO Easy_Rec.easy.abonnement_candidats (recruteur_id,date_debut,date_fin,forfait)  
+        INSERT INTO Easy_Rec.easy.abonnement_candidats (candidat_id,date_debut,date_fin,forfait)  
         VALUES (%s, %s, %s, %s)
         """ 
     
-    params=[U.recruteur_id,begin_date,end_date,U.forfait]
+    params=[U.candidat_id_id,begin_date,end_date,U.forfait]
     cursor.execute(sql,params)
     return{"message":"Ok"}
 
@@ -300,7 +313,8 @@ async def getLettreMotivation(offre_id:str):
     response=f"titre:{resultat[0]}\n salaire:{ resultat[1]}\n description:{resultat[2]}\n competences:{resultat[3]}"
     lettre=lettre_motivation(response)
     return{"message":lettre} 
-    
+
+
 
  
 
@@ -308,7 +322,6 @@ async def getLettreMotivation(offre_id:str):
 
 
         
-    
 
 
 
