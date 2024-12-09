@@ -48,6 +48,9 @@ class Acandidats(BaseModel):
 class Chat(BaseModel):
       id:str
       text:str
+
+class Match(BaseModel):
+      id:str
       
 
       

@@ -19,7 +19,7 @@ const formSchema = yup.object({
   
   const submit = async (values) => {
   const offre_id=values.email
-  const response= await fetch(`${SOURCE}/get_lettre_motivation/${offre_id}`, {
+  const response= await fetch(`${SOURCE}/matching/${offre_id}`, {
   
   method:"Get",
   

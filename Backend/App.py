@@ -7,8 +7,8 @@ import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from .Functions import password_hash,password_verify
-from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs,Chat
-from.Funct_Ia import lettre_motivation,chat
+from.Models import Recruteurs,Candidats,Offres,log_candidat,log_recruteur,OByIdR,OByIdC,Acandidats,Arecruteurs,Chat,Match
+from.Funct_Ia import lettre_motivation,chat,cv_matching
 
 
 load_dotenv()
@@ -32,7 +32,7 @@ conn= sc.connect(
    
 )
 cursor=conn.cursor()
-
+ 
 @app.post("/register_recruteur")
 
 async def Recruteur_register(U:Recruteurs):
@@ -322,7 +322,7 @@ async def chatbot(U:Chat):
             left join Easy_Rec.easy.offres o on c.offre_id=o.offre_id
             left join Easy_Rec.easy.candidats a on c.candidat_id=a.candidat_id
             where c.candidat_id=%s;
-        """ 
+        """  
     params=[U.id]
     cursor.execute(sql,params)
     resultat=cursor.fetchone()
@@ -332,10 +332,54 @@ async def chatbot(U:Chat):
     x=chat(path,response,question)
     return{"response":x}
  
+#pour matcher le cv avec l'offre j'ai ajoute ca 
+@app.get("/matching/{offre_id}")
+
+async def Matching(offre_id:str):
+    
+    def cv():
+
+        sql1=""" select cv from Easy_Rec.easy.candidats 
+                where candidat_id=%s
+    """
+        params=[offre_id]
+        cursor.execute (sql1,params)
+        resultat=cursor.fetchone()
+        path=resultat[0]
+        
+        
+        return path
+    
+    def offre():
+        sql2=""" select titre,salaire,competences,description ,offre_id,recruteur_id from Easy_Rec.easy.offres
+            """
+        cursor.execute(sql2)
+        resultat=cursor.fetchall()
+        return resultat
+    path=cv()
+    resultat=offre()
+    print(path)
+   
+
+  
+    response=[]
+    for row in resultat:
+
+        response=f"titre:{row[0]}\n\n salaire:{row[1]}\n\n description:\t{row[3]}\n\n competences:\t{row[2]}"
 
 
-
-
+        x=cv_matching(path,response)
+        if x*100 > 78:
+           
+            result={
+                "titre":row[0],
+                "salaire":row[1],
+                "competences":row[2],
+                "description":row[3]
+            }    
+        
+            response.append(result) 
+    return{'message':response}
         
 
 

@@ -7,6 +7,7 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_community.document_loaders import Docx2txtLoader
 from dotenv import load_dotenv
+
 import os
 
 load_dotenv()
