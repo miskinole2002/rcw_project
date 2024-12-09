@@ -333,16 +333,16 @@ async def chatbot(U:Chat):
     return{"response":x}
  
 #pour matcher le cv avec l'offre j'ai ajoute ca 
-@app.get("/matching/{offre_id}")
+@app.get("/matching/{candidat_id}")
 
-async def Matching(offre_id:str):
+async def Matching(candidat_id:str):
     
     def cv():
 
         sql1=""" select cv from Easy_Rec.easy.candidats 
                 where candidat_id=%s
     """
-        params=[offre_id]
+        params=[candidat_id]
         cursor.execute (sql1,params)
         resultat=cursor.fetchone()
         path=resultat[0]
