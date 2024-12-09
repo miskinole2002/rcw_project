@@ -381,6 +381,16 @@ async def Matching(candidat_id:str):
             response.append(result) 
     return{'message':response}
         
+@app.get("/candidatures/{candidat_id}{offre_id}")
+async  def Candidatures(candidat_id:str,offre_id:str):
+
+    sql=""" insert into Easy_Rec.easy.candidatures(candidat_id,offre_id)
+            values(%s,%s)
+"""
+    params=[candidat_id,offre_id]
+    cursor.execute(sql,params)
+
+    return{"message":"candidatures crees"}
 
 
 
